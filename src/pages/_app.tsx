@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import localFont from "next/font/local";
+import { NextUIProvider } from "@nextui-org/react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -16,8 +17,12 @@ const geistMono = localFont({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <main className={`${geistSans.variable} ${geistMono.variable}`}>
-      <Component {...pageProps} />
+    <main
+      className={`${geistSans.variable} ${geistMono.variable} light text-foreground bg-background`}
+    >
+      <NextUIProvider>
+        <Component {...pageProps} />
+      </NextUIProvider>
     </main>
   );
 }
