@@ -1,5 +1,10 @@
 import { sdk } from "@/libs/bitkub-sdk";
 import { usePushProtocolStore } from "@/stores/pushProtocolStore";
+import {
+  checkMessageFormat,
+  decodeMessage,
+  encodeMessage,
+} from "@/utils/string.util";
 import { PushAPI } from "@pushprotocol/restapi";
 import { useCallback, useEffect } from "react";
 
@@ -28,12 +33,12 @@ export const useChatGroup = (_client?: PushAPI) => {
 
     console.log("CHAT_GROUP_ID", message, CHAT_GROUP_ID);
 
+    const address = await sdk.getUserWalletAddress();
+
     const res = await client.chat.send(CHAT_GROUP_ID, {
-      content: message,
+      content: encodeMessage(address, message),
       type: "Text",
     });
-
-    const address = res.fromDID.split(":")[1];
 
     addHistoryMessage({
       address,
@@ -45,20 +50,40 @@ export const useChatGroup = (_client?: PushAPI) => {
   };
 
   const initHistoryMessages = useCallback(async () => {
-    if (!client) return;
-    const history = await client.chat.history(CHAT_GROUP_ID, { limit: 10 });
+    if (!client) {
+      await initClient();
+    }
+    
+    const history = await client?.chat.history(CHAT_GROUP_ID, { limit: 20 }) || [];
     console.log("history", history);
     setHistoryMessages(
-      history.map((h) => ({
-        address: h.fromDID.split(":")[1],
-        content: h.messageContent,
-        timestamp: new Date(h.timestamp).getTime(),
-      }))
+      history
+        .map((h) => {
+          if (checkMessageFormat(h?.messageContent)) {
+            return {
+              address: decodeMessage(h?.messageContent).address,
+              content: decodeMessage(h?.messageContent).content,
+              timestamp: new Date(h?.timestamp).getTime(),
+            };
+          } else if (h?.fromDID && h?.messageContent && h?.timestamp) {
+            return {
+              address: h.fromDID.split(":")[1],
+              content: h?.messageContent,
+              timestamp: new Date(h?.timestamp).getTime(),
+            };
+          }
+          // Return undefined if no conditions are met
+        })
+        .filter(
+          (
+            msg
+          ): msg is { address: string; content: string; timestamp: number } =>
+            msg !== undefined
+        ) // Filter out undefined values
     );
-  }, [client, setHistoryMessages]);
+  }, [client, initClient, setHistoryMessages]);
 
   useEffect(() => {
-    if (!client) return;
     initHistoryMessages();
   }, [client, initClient, initHistoryMessages]);
 

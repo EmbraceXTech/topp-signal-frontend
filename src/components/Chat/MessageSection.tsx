@@ -1,6 +1,6 @@
 import { CircleUserRound } from "lucide-react";
 
-import { truncateAddress } from "@/utils/truncrate";
+import { truncateAddress } from "@/utils/string.util";
 import { Avatar } from "@nextui-org/react";
 
 export default function MessageSection({

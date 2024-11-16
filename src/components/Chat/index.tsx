@@ -11,7 +11,7 @@ export default function Chat() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { sendChat } = useChatGroup();
-  const { historyMessages } = usePushProtocolStore();
+  const { historyMessages, isLoading: isLoadingStore } = usePushProtocolStore();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsLoading(true);
@@ -31,15 +31,21 @@ export default function Chat() {
   return (
     <div className="h-full flex flex-col">
       {/* chat history */}
-      <div className="flex-1 flex flex-col justify-between">
+      <div className="h-full flex flex-col justify-between">
         {/* flex-col-reverse */}
-        <div className="overflow-y-scroll flex flex-col space-y-4 text-wrap">
-          {historyMessages.map((h, k) => (
-            <div key={k} className="text-sm">
-              <MessageSection address={h.address} content={h.content} />
-              {/* <div>{new Date(h.timestamp).toLocaleString()}</div> */}
+        <div className="overflow-y-scroll flex flex-col-reverse space-y-3 text-wrap">
+          {isLoadingStore ? (
+            <div className="flex justify-center items-center">
+              <Button isLoading isIconOnly />
             </div>
-          ))}
+          ) : (
+            historyMessages.map((h, k) => (
+              <div key={k} className="text-sm">
+                <MessageSection address={h.address} content={h.content} />
+                {/* <div>{new Date(h.timestamp).toLocaleString()}</div> */}
+              </div>
+            ))
+          )}
         </div>
         {/* chat input */}
         <form onSubmit={onSubmit} className="flex space-x-1">
