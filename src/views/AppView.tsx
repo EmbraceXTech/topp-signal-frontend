@@ -4,7 +4,7 @@ import React from "react";
 export default function AppView() {
   const timeZone = Math.abs(new Date().getTimezoneOffset() / 60);
   const timeFrame = 30; // minutes
-  const timeOffset = 3; // hours
+  const timeOffset = 3.5; // hours
   const timeSlotCount = 5;
 
   const startTime =

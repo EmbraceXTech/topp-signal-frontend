@@ -1,6 +1,6 @@
-import { Button } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import React from "react";
+import CustomConnectWalletBtn from "../CustomConnectWalletBtn";
 
 export default function MainNavbar() {
   const router = useRouter();
@@ -40,7 +40,7 @@ export default function MainNavbar() {
           ))}
         </div>
       </div>
-      <Button color="primary">Connect Wallet</Button>
+      <CustomConnectWalletBtn />
     </div>
   );
 }

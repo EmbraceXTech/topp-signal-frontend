@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@bitkub-chain/sdk.js": "^0.1.6",
     "@nextui-org/react": "^2.4.8",
     "framer-motion": "^11.11.17",
     "lucide-react": "^0.460.0",
