@@ -93,8 +93,8 @@ export const useChatGroup = (_client?: PushAPI) => {
     console.log("addressUnique", addressUnique);
 
     const ensNamePromise = addressUnique.map(async (addr, index) => {
-      await new Promise((resolve) => setTimeout(resolve, index * 1000));
       try {
+        await new Promise((resolve) => setTimeout(resolve, index * 1000));
         if (!addr || addr.length === 0) {
           return {
             addr,
