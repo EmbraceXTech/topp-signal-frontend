@@ -54,89 +54,95 @@ export const useChatGroup = (_client?: PushAPI) => {
   };
 
   const initHistoryMessages = useCallback(async () => {
-    if (!client) {
-      await initClient();
-    }
+    try {
+      if (!client) {
+        await initClient();
+      }
 
-    const history =
-      (await client?.chat.history(CHAT_GROUP_ID, { limit: 10 })) || [];
-    console.log("history", history);
-    const historyFormat = history
-      .map((h) => {
-        if (checkMessageFormat(h?.messageContent)) {
-          console.log(h?.messageContent);
-          console.log(decodeMessage(h?.messageContent));
+      const history =
+        (await client?.chat.history(CHAT_GROUP_ID, { limit: 10 })) || [];
+      console.log("history", history);
+      const historyFormat = history
+        .map((h) => {
+          if (checkMessageFormat(h?.messageContent)) {
+            console.log(h?.messageContent);
+            console.log(decodeMessage(h?.messageContent));
+            return {
+              address: decodeMessage(h?.messageContent).address,
+              content: decodeMessage(h?.messageContent).content,
+              timestamp: new Date(h?.timestamp).getTime(),
+            };
+          } else if (h?.fromDID && h?.messageContent && h?.timestamp) {
+            return {
+              address: h.fromDID.split(":")[1],
+              content: h?.messageContent,
+              timestamp: new Date(h?.timestamp).getTime(),
+            };
+          }
+          // Return undefined if no conditions are met
+        })
+        .filter(
+          (
+            msg
+          ): msg is { address: string; content: string; timestamp: number } =>
+            msg !== undefined
+        ); // Filter out undefined values
+
+      // TODO: if address is empty string then remove it
+
+      const addressUnique = [
+        ...new Set(historyFormat.map((addr) => addr.address)),
+      ];
+      console.log("addressUnique", addressUnique);
+
+      const ensNamePromise = addressUnique.map(async (addr, index) => {
+        try {
+          await new Promise((resolve) => setTimeout(resolve, index * 1000));
+          if (!addr || addr.length === 0) {
+            return {
+              addr,
+              ensName: null,
+              avatar: undefined,
+            };
+          }
+          const ensName = await getEnsName(addr);
+          const avatar = ensName ? await getEnsAvatar(ensName) : undefined;
           return {
-            address: decodeMessage(h?.messageContent).address,
-            content: decodeMessage(h?.messageContent).content,
-            timestamp: new Date(h?.timestamp).getTime(),
+            addr,
+            ensName,
+            avatar,
           };
-        } else if (h?.fromDID && h?.messageContent && h?.timestamp) {
-          return {
-            address: h.fromDID.split(":")[1],
-            content: h?.messageContent,
-            timestamp: new Date(h?.timestamp).getTime(),
-          };
-        }
-        // Return undefined if no conditions are met
-      })
-      .filter(
-        (msg): msg is { address: string; content: string; timestamp: number } =>
-          msg !== undefined
-      ); // Filter out undefined values
-
-    // TODO: if address is empty string then remove it
-
-    const addressUnique = [
-      ...new Set(historyFormat.map((addr) => addr.address)),
-    ];
-    console.log("addressUnique", addressUnique);
-
-    const ensNamePromise = addressUnique.map(async (addr, index) => {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, index * 1000));
-        if (!addr || addr.length === 0) {
+        } catch (error) {
+          console.error("error", error);
           return {
             addr,
             ensName: null,
             avatar: undefined,
           };
         }
-        const ensName = await getEnsName(addr);
-        const avatar = ensName ? await getEnsAvatar(ensName) : undefined;
+      });
+
+      const ensNameList = await Promise.all(ensNamePromise);
+
+      console.log("ensNameList", ensNameList);
+
+      const historyWithEnsName = historyFormat.map((h) => {
+        const match = ensNameList.find((e) => e.addr === h.address);
+        const ensName = match?.ensName;
+        const avatar = match?.avatar;
         return {
-          addr,
-          ensName,
-          avatar,
+          ...h,
+          ensName: ensName || undefined,
+          avatar: avatar || undefined,
         };
-      } catch (error) {
-        console.error("error", error);
-        return {
-          addr,
-          ensName: null,
-          avatar: undefined,
-        };
-      }
-    });
+      });
 
-    const ensNameList = await Promise.all(ensNamePromise);
+      console.log("historyWithEnsName", historyWithEnsName);
 
-    console.log("ensNameList", ensNameList);
-
-    const historyWithEnsName = historyFormat.map((h) => {
-      const match = ensNameList.find((e) => e.addr === h.address);
-      const ensName = match?.ensName;
-      const avatar = match?.avatar;
-      return {
-        ...h,
-        ensName: ensName || undefined,
-        avatar: avatar || undefined,
-      };
-    });
-
-    console.log("historyWithEnsName", historyWithEnsName);
-
-    setHistoryMessages(historyWithEnsName);
+      setHistoryMessages(historyWithEnsName);
+    } catch (error) {
+      console.error(error);
+    }
   }, [client, initClient, setHistoryMessages]);
 
   useEffect(() => {

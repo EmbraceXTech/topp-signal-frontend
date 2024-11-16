@@ -58,80 +58,85 @@ export const usePushProtocolStore = create<IPushProtocolStore>()(
       //   return client ? JSON.parse(client) : null;
       // },
       initClient: async (signer?: ethers.BrowserProvider) => {
-        get().setIsLoading(true);
-        const _signer = signer ?? ethers.Wallet.createRandom();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const client = await PushAPI.initialize(_signer as any, {
-          env: CONSTANTS.ENV.STAGING,
-        });
-        await client.chat.group.join(CHAT_GROUP_ID);
-        const stream = await client.initStream(
-          [
-            CONSTANTS.STREAM.CHAT, // Listen for chat messages
-            CONSTANTS.STREAM.NOTIF, // Listen for notifications
-            CONSTANTS.STREAM.CONNECT, // Listen for connection events
-            CONSTANTS.STREAM.DISCONNECT, // Listen for disconnection events
-          ],
-          {
-            // Filter options:
-            filter: {
-              // Listen to all channels and chats (default):
-              channels: ["*"],
-              chats: [CHAT_GROUP_ID],
-              // Listen to events with a specific recipient:
-              // recipient: '0x...' (replace with recipient wallet address)
-            },
-            // Connection options:
-            connection: {
-              retries: 3, // Retry connection 3 times if it fails
-            },
-            raw: false, // Receive events in structured format
-          }
-        );
+        try {
+          get().setIsLoading(true);
+          const _signer = signer ?? ethers.Wallet.createRandom();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const client = await PushAPI.initialize(_signer as any, {
+            env: CONSTANTS.ENV.STAGING,
+          });
+          await client.chat.group.join(CHAT_GROUP_ID);
+          const stream = await client.initStream(
+            [
+              CONSTANTS.STREAM.CHAT, // Listen for chat messages
+              CONSTANTS.STREAM.NOTIF, // Listen for notifications
+              CONSTANTS.STREAM.CONNECT, // Listen for connection events
+              CONSTANTS.STREAM.DISCONNECT, // Listen for disconnection events
+            ],
+            {
+              // Filter options:
+              filter: {
+                // Listen to all channels and chats (default):
+                channels: ["*"],
+                chats: [CHAT_GROUP_ID],
+                // Listen to events with a specific recipient:
+                // recipient: '0x...' (replace with recipient wallet address)
+              },
+              // Connection options:
+              connection: {
+                retries: 3, // Retry connection 3 times if it fails
+              },
+              raw: false, // Receive events in structured format
+            }
+          );
 
-        // Stream connection established:
-        stream.on(CONSTANTS.STREAM.CONNECT, async () => {
-          console.log("Stream Connected");
-        });
+          // Stream connection established:
+          stream.on(CONSTANTS.STREAM.CONNECT, async () => {
+            console.log("Stream Connected");
+          });
 
-        // Chat message received:
-        stream.on(CONSTANTS.STREAM.CHAT, (message) => {
-          console.log("Encrypted Message Received");
-          console.log(message);
-          if (checkMessageFormat(message?.message?.content)) {
-            get().addHistoryMessage({
-              address: decodeMessage(message?.message?.content).address,
-              content: decodeMessage(message?.message?.content).content,
-              timestamp: new Date(Number(message?.timestamp)).getTime(),
-            });
-          } else if (
-            message?.from &&
-            message?.message?.content &&
-            message?.timestamp
-          ) {
-            get().addHistoryMessage({
-              address: message?.from?.split(":")[1] ?? " ",
-              content: message?.message?.content ?? " ",
-              timestamp: new Date(Number(message?.timestamp)).getTime(),
-            });
-          }
-        });
+          // Chat message received:
+          stream.on(CONSTANTS.STREAM.CHAT, (message) => {
+            console.log("Encrypted Message Received");
+            console.log(message);
+            if (checkMessageFormat(message?.message?.content)) {
+              get().addHistoryMessage({
+                address: decodeMessage(message?.message?.content).address,
+                content: decodeMessage(message?.message?.content).content,
+                timestamp: new Date(Number(message?.timestamp)).getTime(),
+              });
+            } else if (
+              message?.from &&
+              message?.message?.content &&
+              message?.timestamp
+            ) {
+              get().addHistoryMessage({
+                address: message?.from?.split(":")[1] ?? " ",
+                content: message?.message?.content ?? " ",
+                timestamp: new Date(Number(message?.timestamp)).getTime(),
+              });
+            }
+          });
 
-        // Chat operation received:
-        stream.on(CONSTANTS.STREAM.CHAT_OPS, (data) => {
-          console.log("Chat operation received.");
-          console.log(data);
-        });
+          // Chat operation received:
+          stream.on(CONSTANTS.STREAM.CHAT_OPS, (data) => {
+            console.log("Chat operation received.");
+            console.log(data);
+          });
 
-        // Connect the stream:
-        await stream.connect();
+          // Connect the stream:
+          await stream.connect();
 
-        // Stream disconnection:
-        stream.on(CONSTANTS.STREAM.DISCONNECT, () => {
-          console.log("Stream Disconnected");
-        });
-        get().setClient(client);
-        get().setIsLoading(false);
+          // Stream disconnection:
+          stream.on(CONSTANTS.STREAM.DISCONNECT, () => {
+            console.log("Stream Disconnected");
+          });
+          get().setClient(client);
+          get().setIsLoading(false);
+        } catch (error) {
+          console.error(error);
+          get().setIsLoading(false);
+        }
       },
       historyMessages: [],
       addHistoryMessage: (message) =>
