@@ -1,3 +1,4 @@
+import { Button } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import React from "react";
 
@@ -22,7 +23,8 @@ export default function MainNavbar() {
           className="font-bold text-2xl cursor-pointer"
           onClick={() => router.push("/")}
         >
-          Topp<span className="font-normal">Signal</span>
+          <span className="text-primary">Topp</span>
+          <span className="font-normal">Signal</span>
         </p>
         <div className="flex items-center ml-[40px] space-x-5 text-md">
           {menuItems.map((item) => (
@@ -38,7 +40,7 @@ export default function MainNavbar() {
           ))}
         </div>
       </div>
-      {/* Connect Wallet Button */}
+      <Button color="primary">Connect Wallet</Button>
     </div>
   );
 }
