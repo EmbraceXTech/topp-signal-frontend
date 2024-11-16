@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@metamask/providers": "^18.1.1",
     "@nextui-org/react": "^2.4.8",
     "@pushprotocol/restapi": "^1.7.29",
     "@pushprotocol/socket": "^0.5.3",
