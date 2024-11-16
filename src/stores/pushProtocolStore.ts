@@ -27,7 +27,7 @@ type IPushProtocolStore = {
   }) => void;
 };
 
-const CHAT_GROUP_ID = process.env.NEXT_PUBLIC_ROOM_ID || "50d6c4d68f7f63d97a8adfe0e0b1bd6e04d65ef5925e37d13a479d2a083a4d1b";
+const CHAT_GROUP_ID = process.env.NEXT_PUBLIC_ROOM_ID || "d349d7acb457d93f4686b44edcefe76725dedffd705b71bef819ebeaf00c2e19";
 
 export const usePushProtocolStore = create<IPushProtocolStore>()(
   persist(

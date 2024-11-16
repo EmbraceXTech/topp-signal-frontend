@@ -11,7 +11,7 @@ declare global {
 
 // TODO: Change to env variable
 const CHAT_GROUP_ID =
-  "50d6c4d68f7f63d97a8adfe0e0b1bd6e04d65ef5925e37d13a479d2a083a4d1b";
+  "d349d7acb457d93f4686b44edcefe76725dedffd705b71bef819ebeaf00c2e19";
 
 export const useChatGroup = (_client?: PushAPI) => {
   const {
@@ -25,6 +25,8 @@ export const useChatGroup = (_client?: PushAPI) => {
 
   const sendChat = async (message: string) => {
     if (!client) return;
+
+    console.log("CHAT_GROUP_ID", message, CHAT_GROUP_ID);
 
     const res = await client.chat.send(CHAT_GROUP_ID, {
       content: message,
@@ -45,6 +47,7 @@ export const useChatGroup = (_client?: PushAPI) => {
   const initHistoryMessages = useCallback(async () => {
     if (!client) return;
     const history = await client.chat.history(CHAT_GROUP_ID, { limit: 10 });
+    console.log("history", history);
     setHistoryMessages(
       history.map((h) => ({
         address: h.fromDID.split(":")[1],

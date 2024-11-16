@@ -44,7 +44,7 @@ export default function Chat() {
         {/* chat input */}
         <form onSubmit={onSubmit} className="flex space-x-1">
           <Input
-            // name="message"
+            name="message"
             type="text"
             placeholder="Type your message..."
             disabled={isLoading}
