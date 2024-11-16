@@ -7,7 +7,8 @@ export const encodeMessage = (address: string, message: string) => {
 }
 
 export const decodeMessage = (message: string) => {
-  const [address, content] = message.split("::");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, address, content] = message.split("::");
   return { address, content };
 };
 
