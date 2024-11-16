@@ -1,4 +1,5 @@
 import { sdk } from "@/libs/bitkub-sdk";
+import { getEnsAvatar, getEnsName } from "@/services/ens.service";
 import { usePushProtocolStore } from "@/stores/pushProtocolStore";
 import {
   checkMessageFormat,
@@ -40,10 +41,13 @@ export const useChatGroup = (_client?: PushAPI) => {
       type: "Text",
     });
 
+    const ensName = await getEnsName(address);
+    console.log("ensName", ensName);
     addHistoryMessage({
       address,
       content: message,
       timestamp: new Date().getTime(),
+      ensName: ensName || undefined,
     });
 
     return res;
@@ -53,34 +57,86 @@ export const useChatGroup = (_client?: PushAPI) => {
     if (!client) {
       await initClient();
     }
-    
-    const history = await client?.chat.history(CHAT_GROUP_ID, { limit: 20 }) || [];
+
+    const history =
+      (await client?.chat.history(CHAT_GROUP_ID, { limit: 10 })) || [];
     console.log("history", history);
-    setHistoryMessages(
-      history
-        .map((h) => {
-          if (checkMessageFormat(h?.messageContent)) {
-            return {
-              address: decodeMessage(h?.messageContent).address,
-              content: decodeMessage(h?.messageContent).content,
-              timestamp: new Date(h?.timestamp).getTime(),
-            };
-          } else if (h?.fromDID && h?.messageContent && h?.timestamp) {
-            return {
-              address: h.fromDID.split(":")[1],
-              content: h?.messageContent,
-              timestamp: new Date(h?.timestamp).getTime(),
-            };
-          }
-          // Return undefined if no conditions are met
-        })
-        .filter(
-          (
-            msg
-          ): msg is { address: string; content: string; timestamp: number } =>
-            msg !== undefined
-        ) // Filter out undefined values
-    );
+    const historyFormat = history
+      .map((h) => {
+        if (checkMessageFormat(h?.messageContent)) {
+          console.log(h?.messageContent);
+          console.log(decodeMessage(h?.messageContent));
+          return {
+            address: decodeMessage(h?.messageContent).address,
+            content: decodeMessage(h?.messageContent).content,
+            timestamp: new Date(h?.timestamp).getTime(),
+          };
+        } else if (h?.fromDID && h?.messageContent && h?.timestamp) {
+          return {
+            address: h.fromDID.split(":")[1],
+            content: h?.messageContent,
+            timestamp: new Date(h?.timestamp).getTime(),
+          };
+        }
+        // Return undefined if no conditions are met
+      })
+      .filter(
+        (msg): msg is { address: string; content: string; timestamp: number } =>
+          msg !== undefined
+      ); // Filter out undefined values
+
+    // TODO: if address is empty string then remove it
+
+    const addressUnique = [
+      ...new Set(historyFormat.map((addr) => addr.address)),
+    ];
+    console.log("addressUnique", addressUnique);
+
+    const ensNamePromise = addressUnique.map(async (addr, index) => {
+      await new Promise((resolve) => setTimeout(resolve, index * 1000));
+      try {
+        if (!addr || addr.length === 0) {
+          return {
+            addr,
+            ensName: null,
+            avatar: undefined,
+          };
+        }
+        const ensName = await getEnsName(addr);
+        const avatar = ensName ? await getEnsAvatar(ensName) : undefined;
+        return {
+          addr,
+          ensName,
+          avatar,
+        };
+      } catch (error) {
+        console.error("error", error);
+        return {
+          addr,
+          ensName: null,
+          avatar: undefined,
+        };
+      }
+    });
+
+    const ensNameList = await Promise.all(ensNamePromise);
+
+    console.log("ensNameList", ensNameList);
+
+    const historyWithEnsName = historyFormat.map((h) => {
+      const match = ensNameList.find((e) => e.addr === h.address);
+      const ensName = match?.ensName;
+      const avatar = match?.avatar;
+      return {
+        ...h,
+        ensName: ensName || undefined,
+        avatar: avatar || undefined,
+      };
+    });
+
+    console.log("historyWithEnsName", historyWithEnsName);
+
+    setHistoryMessages(historyWithEnsName);
   }, [client, initClient, setHistoryMessages]);
 
   useEffect(() => {

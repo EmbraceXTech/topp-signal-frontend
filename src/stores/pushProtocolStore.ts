@@ -10,23 +10,29 @@ type IPushProtocolStore = {
   setIsLoading: (isLoading: boolean) => void;
   setClient: (client: PushAPI) => void;
   // getClient: () => PushAPI | null;
-  initClient: (signer?: ethers.providers.JsonRpcSigner) => Promise<void>;
+  initClient: (signer?: ethers.BrowserProvider) => Promise<void>;
   historyMessages: {
     address: string;
     content: string;
     timestamp: number;
+    ensName?: string;
+    avatar?: string;
   }[];
   setHistoryMessages: (
     messages: {
       address: string;
       content: string;
       timestamp: number;
+      ensName?: string;
+      avatar?: string;
     }[]
   ) => void;
   addHistoryMessage: (message: {
     address: string;
     content: string;
     timestamp: number;
+    ensName?: string;
+    avatar?: string;
   }) => void;
 };
 
@@ -51,10 +57,11 @@ export const usePushProtocolStore = create<IPushProtocolStore>()(
       //   const client = localStorage.getItem("push-protocol-client");
       //   return client ? JSON.parse(client) : null;
       // },
-      initClient: async (signer?: ethers.providers.JsonRpcSigner) => {
+      initClient: async (signer?: ethers.BrowserProvider) => {
         get().setIsLoading(true);
         const _signer = signer ?? ethers.Wallet.createRandom();
-        const client = await PushAPI.initialize(_signer, {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const client = await PushAPI.initialize(_signer as any, {
           env: CONSTANTS.ENV.STAGING,
         });
         await client.chat.group.join(CHAT_GROUP_ID);
@@ -131,7 +138,9 @@ export const usePushProtocolStore = create<IPushProtocolStore>()(
         set((state) => ({
           historyMessages: [message, ...state.historyMessages],
         })),
-      setHistoryMessages: (messages) => set({ historyMessages: messages }),
+      setHistoryMessages: (messages) => {
+        set({ historyMessages: messages });
+      },
     }),
     {
       name: "push-protocol-store",

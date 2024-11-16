@@ -2,7 +2,7 @@ import Chat from "@/components/Chat";
 import { usePushProtocolStore } from "@/stores/pushProtocolStore";
 import { PushAPI, CONSTANTS } from "@pushprotocol/restapi";
 import { ethers } from "ethers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 declare global {
   interface Window {
@@ -11,7 +11,7 @@ declare global {
 }
 
 export default function Test() {
-  const [_signer, setSigner] = useState<ethers.providers.JsonRpcSigner>();
+  const [_signer, setSigner] = useState<ethers.BrowserProvider>();
   const { initClient } = usePushProtocolStore();
 
   const connectWallet = async () => {
@@ -19,9 +19,9 @@ export default function Test() {
     if (!window.ethereum) {
       throw new Error("MetaMask is not installed");
     }
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const provider = new ethers.BrowserProvider(window.ethereum);
     await provider.send("eth_requestAccounts", []); // Request account access
-    const signer = provider.getSigner();
+    const signer = await provider.getSigner();
     setSigner(signer);
     await initClient(signer);
   };
@@ -72,6 +72,15 @@ export default function Test() {
       }
     );
   };
+
+  useEffect(() => {
+    async function getEnsName() {
+      const provider = new ethers.JsonRpcProvider("https://eth-sepolia.public.blastapi.io");
+      const ensName = await provider.lookupAddress("0xE3876f1D0D0DbC782d7844FdE8675c75628E36a2");
+      console.log(ensName);
+    }
+    getEnsName();
+  }, []);
   return (
     <div>
       <div className="flex gap-4">

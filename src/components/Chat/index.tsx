@@ -39,12 +39,18 @@ export default function Chat() {
               <Button isLoading isIconOnly />
             </div>
           ) : (
-            historyMessages.map((h, k) => (
-              <div key={k} className="text-sm">
-                <MessageSection address={h.address} content={h.content} />
-                {/* <div>{new Date(h.timestamp).toLocaleString()}</div> */}
-              </div>
-            ))
+            historyMessages.map((h, k) => {
+              return (
+                <div key={k} className="text-sm">
+                  <MessageSection
+                    name={h.ensName || h.address}
+                    content={h.content}
+                    avatar={h.avatar}
+                  />
+                  {/* <div>{new Date(h.timestamp).toLocaleString()}</div> */}
+                </div>
+              );
+            })
           )}
         </div>
         {/* chat input */}
