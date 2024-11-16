@@ -18,7 +18,7 @@ const geistMono = localFont({
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <main
-      className={`${geistSans.variable} ${geistMono.variable} light text-foreground bg-background`}
+      className={`${geistSans.variable} ${geistMono.variable} light bg-[#F5F5F5] text-gray-700`}
     >
       <NextUIProvider>
         <Component {...pageProps} />
