@@ -80,7 +80,7 @@ export default function Test() {
         <button onClick={connectWallet}>Connect Wallet</button>
       </div>
       <div className="min-h-96">
-        <Chat signer={_signer} />
+        <Chat />
       </div>
     </div>
   );
