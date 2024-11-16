@@ -1,8 +1,11 @@
+import { useNativeBalance } from "@/hooks/useNativeBalance";
 import { Button, Input } from "@nextui-org/react";
 import { ArrowLeft, DicesIcon } from "lucide-react";
 import React from "react";
 
 export default function PredictionInput({ onClose }: { onClose: () => void }) {
+  const { balance } = useNativeBalance();
+
   return (
     <div className="w-full h-full">
       <div className="flex items-center px-4 pt-4 relative">
@@ -31,7 +34,7 @@ export default function PredictionInput({ onClose }: { onClose: () => void }) {
         <div className="space-y-1">
           <div className="flex items-center justify-between text-xs px-1 mt-5">
             <p>Balance:</p>
-            <p>50.12 KUB</p>
+            <p>{balance} KUB</p>
           </div>
           <Input
             required
