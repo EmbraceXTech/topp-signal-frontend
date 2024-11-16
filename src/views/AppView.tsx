@@ -6,7 +6,7 @@ export default function AppView() {
   const { timeSlotsData, latestPrice } = useTimeSlot();
 
   return (
-    <div className="w-full h-[500px] flex justify-center pt-10 space-x-10 overflow-x-scroll px-10 pl-[850px]">
+    <div className="w-full h-[500px] flex justify-center pt-10 space-x-10 overflow-x-scroll px-10 pl-[690px]">
       {timeSlotsData.map((item, index) => {
         const change =
           index === 0
