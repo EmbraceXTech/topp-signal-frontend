@@ -14,10 +14,16 @@ export default function MessageSection({
   avatar?: string;
 }) {
   return (
-    <div className="flex items-center space-x-1">
-      {avatar ? <Avatar src={avatar} size="sm" /> : <CircleUserRound color="#737373" size={30} />}
-      <div className="text-black font-semibold">
-        {isWalletAddress(name) ? truncateAddress(name) : name}
+    <div>
+      <div className="flex items-center space-x-1">
+        {avatar ? (
+          <Avatar src={avatar} size="sm" />
+        ) : (
+          <CircleUserRound color="#737373" size={30} />
+        )}
+        <div className="text-black font-semibold">
+          {isWalletAddress(name) ? truncateAddress(name) : name}
+        </div>
       </div>
       <div className="text-[#737373]">{content}</div>
     </div>
