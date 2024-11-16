@@ -5,12 +5,14 @@ import {
   CircleX,
   Clock,
   DicesIcon,
+  InfoIcon,
 } from "lucide-react";
 import React, { useState } from "react";
 import ProgressBar from "./ProgressBar";
-import { Button } from "@nextui-org/react";
+import { Button, useDisclosure } from "@nextui-org/react";
 import PredictionInput from "./PredictionInput";
 import useCountdown from "@/hooks/useCountdown";
+import PrizeDistributionModal from "../PrizeDistribution/PrizeDistributionModal";
 
 interface PredictionCardProps {
   timeSlot: number;
@@ -27,6 +29,11 @@ export default function PredictionCard({
 }: PredictionCardProps) {
   const [isPredictionInputOpen, setIsPredictionInputOpen] = useState(false);
   const { remainingTime, progressPercent, isExpired } = useCountdown(timeSlot);
+  const {
+    isOpen: isInfoOpen,
+    onOpen: onInfoOpen,
+    onOpenChange: onInfoOpenChange,
+  } = useDisclosure();
 
   return (
     <div
@@ -34,6 +41,10 @@ export default function PredictionCard({
         isExpired ? "opacity-50" : ""
       }`}
     >
+      <PrizeDistributionModal
+        isOpen={isInfoOpen}
+        onOpenChange={onInfoOpenChange}
+      />
       {isPredictionInputOpen ? (
         <PredictionInput onClose={() => setIsPredictionInputOpen(false)} />
       ) : (
@@ -95,7 +106,14 @@ export default function PredictionCard({
               <p>฿{averagePrice.toFixed(4)}</p>
             </div>
             <div className="flex justify-between font-bold">
-              <p>Prize Pool:</p>
+              <div className="flex items-center space-x-1">
+                <p>Prize Pool</p>
+                <InfoIcon
+                  size={16}
+                  className="text-primary cursor-pointer"
+                  onClick={() => onInfoOpen()}
+                />
+              </div>
               <p>0 KUB</p>
             </div>
           </div>
