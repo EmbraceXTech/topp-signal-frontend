@@ -1,5 +1,6 @@
 import React from "react";
 import MainNavbar from "./MainNavbar";
+import MainSidebar from "./MainSidebar";
 
 export default function MainLayout({
   children,
@@ -9,7 +10,10 @@ export default function MainLayout({
   return (
     <div className="flex flex-col min-h-screen">
       <MainNavbar />
-      {children}
+      <div className="flex flex-1">
+        <MainSidebar />
+        <div>{children}</div>
+      </div>
     </div>
   );
 }

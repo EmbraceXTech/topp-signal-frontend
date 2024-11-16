@@ -1,10 +1,17 @@
+import { sdk } from "@/libs/bitkub-sdk";
 import { usePushProtocolStore } from "@/stores/pushProtocolStore";
 import { PushAPI } from "@pushprotocol/restapi";
 import { useCallback, useEffect } from "react";
 
+declare global {
+  interface Window {
+    ethereum?: never;
+  }
+}
+
 // TODO: Change to env variable
 const CHAT_GROUP_ID =
-  "d349d7acb457d93f4686b44edcefe76725dedffd705b71bef819ebeaf00c2e19";
+  "50d6c4d68f7f63d97a8adfe0e0b1bd6e04d65ef5925e37d13a479d2a083a4d1b";
 
 export const useChatGroup = (_client?: PushAPI) => {
   const {
@@ -12,6 +19,7 @@ export const useChatGroup = (_client?: PushAPI) => {
     // getClient,
     setHistoryMessages,
     addHistoryMessage,
+    initClient,
   } = usePushProtocolStore();
   const client = _client || clientStore;
 
@@ -49,7 +57,7 @@ export const useChatGroup = (_client?: PushAPI) => {
   useEffect(() => {
     if (!client) return;
     initHistoryMessages();
-  }, [client, initHistoryMessages]);
+  }, [client, initClient, initHistoryMessages]);
 
   return { client, sendChat };
 };

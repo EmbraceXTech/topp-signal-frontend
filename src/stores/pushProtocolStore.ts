@@ -3,12 +3,11 @@ import { ethers } from "ethers";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-
 type IPushProtocolStore = {
   client: PushAPI | null;
   setClient: (client: PushAPI) => void;
   // getClient: () => PushAPI | null;
-  initClient: (signer: ethers.providers.JsonRpcSigner) => Promise<void>;
+  initClient: (signer?: ethers.providers.JsonRpcSigner) => Promise<void>;
   historyMessages: {
     address: string;
     content: string;
@@ -28,8 +27,7 @@ type IPushProtocolStore = {
   }) => void;
 };
 
-const CHAT_GROUP_ID =
-  "d349d7acb457d93f4686b44edcefe76725dedffd705b71bef819ebeaf00c2e19";
+const CHAT_GROUP_ID = process.env.NEXT_PUBLIC_ROOM_ID || "50d6c4d68f7f63d97a8adfe0e0b1bd6e04d65ef5925e37d13a479d2a083a4d1b";
 
 export const usePushProtocolStore = create<IPushProtocolStore>()(
   persist(
@@ -46,8 +44,7 @@ export const usePushProtocolStore = create<IPushProtocolStore>()(
       //   const client = localStorage.getItem("push-protocol-client");
       //   return client ? JSON.parse(client) : null;
       // },
-      initClient: async (signer: ethers.providers.JsonRpcSigner) => {
-        
+      initClient: async (signer?: ethers.providers.JsonRpcSigner) => {
         const client = await PushAPI.initialize(signer, {
           env: CONSTANTS.ENV.STAGING,
         });
