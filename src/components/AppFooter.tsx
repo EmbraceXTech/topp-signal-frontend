@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import PredictionTab from "../Prediction/PredictionTab";
-import HistoryTab from "../History/HistoryTab";
+import PredictionTab from "./Prediction/PredictionTab";
+import HistoryTab from "./History/HistoryTab";
 
-export default function MainFooter() {
+export default function AppFooter() {
   const tabs = ["Prediction", "History"];
   const [activeTab, setActiveTab] = useState("Prediction");
 
