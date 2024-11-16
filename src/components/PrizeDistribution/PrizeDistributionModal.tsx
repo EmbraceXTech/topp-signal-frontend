@@ -28,7 +28,7 @@ export default function PrizeDistributionModal({
             <div className="w-full">
               <Card
                 isHoverable
-                className="w-[200px] h-[300px] flex flex-col justify-center items-center"
+                className="w-[230px] h-[300px] flex flex-col justify-center items-center"
               >
                 <div className="text-center p-4">
                   <div className="text-4xl mb-2">👑</div>
@@ -43,7 +43,7 @@ export default function PrizeDistributionModal({
             <div className="w-full">
               <Card
                 isHoverable
-                className="w-[200px] h-[300px] flex flex-col justify-center items-center"
+                className="w-[230px] h-[300px] flex flex-col justify-center items-center"
               >
                 <div className="text-center p-4">
                   <div className="text-4xl mb-2">👑</div>
@@ -59,7 +59,7 @@ export default function PrizeDistributionModal({
             <div className="w-full">
               <Card
                 isHoverable
-                className="w-[200px] h-[300px] flex flex-col justify-center items-center"
+                className="w-[230px] h-[300px] flex flex-col justify-center items-center"
               >
                 <div className="text-center p-4">
                   <div className="text-4xl mb-2">👑</div>
