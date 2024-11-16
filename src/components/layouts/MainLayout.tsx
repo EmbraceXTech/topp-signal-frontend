@@ -12,7 +12,9 @@ export default function MainLayout({
       <MainNavbar />
       <div className="flex flex-1">
         <MainSidebar />
-        <div>{children}</div>
+        <div className="flex-1 overflow-x-auto max-h-[calc(100vh-70px)] overflow-y-scroll">
+          {children}
+        </div>
       </div>
     </div>
   );

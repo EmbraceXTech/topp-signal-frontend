@@ -17,7 +17,7 @@ export default function MainNavbar() {
   ];
 
   return (
-    <div className="bg-white w-full flex items-center justify-between py-[20px] px-10 border-b shadow-sm">
+    <div className="bg-white w-full flex items-center justify-between py-[20px] px-10 border-b shadow-sm h-[70px]">
       <div className="flex items-baseline">
         <p
           className="font-bold text-2xl cursor-pointer"
